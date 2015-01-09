@@ -1,0 +1,5 @@
+SAPUI5ApplicationName=ZSAPUI5_1
+SAPUI5ApplicationPackage=$tmp
+SAPUI5ApplicationDescription=SAPUI5 Test
+AcceptUnixStyleEol=True
+DeltaMode=True
