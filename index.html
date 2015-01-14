@@ -122,6 +122,7 @@
     </script>
 
     <script>
+    // Formatter
     var formatter = {
         uppercaseFirstChar: function(sStr) {
             return sStr.charAt(0).toUpperCase() + sStr.slice(1);
@@ -137,20 +138,8 @@
         }
     };
 
-    // App Controller definition
+    // Define controllers for each view
     sap.ui.controller("local.App.controller", {});
-
-    // Instantiate the App View, assign a model and display
-    var oAppView = sap.ui.xmlview({
-        viewContent: jQuery('#appView').html()
-    });
-
-    oAppView.setModel(
-        sap.ui.model.odata.ODataModel("/V2/(S(sapuidemotdg))/OData/OData.svc/", true)
-    );
-
-    oAppView.placeAt('content');
-
     // Master Controller definition
     sap.ui.controller("local.Master.controller", {
         onSearch: function() {
@@ -171,21 +160,31 @@
             })
         }
     });
+    // Detail Controller definition
+    sap.ui.controller("local.Detail.controller", {});
+
+    // Instantiate the App View, assign a model and display
+    var oAppView = sap.ui.xmlview({
+        viewContent: jQuery('#appView').html()
+    });
+
+    oAppView.setModel(
+        sap.ui.model.odata.ODataModel("/V2/(S(sapuidemotdg))/OData/OData.svc/", true)
+    );
+
+    oAppView.placeAt('content');
 
     // Instantiate Master View
     var oMasterView = sap.ui.xmlview({
         viewContent: jQuery('#masterView').html()
     });
 
-    // Detail Controller definition
-    sap.ui.controller("local.Detail.controller", {});
-
     // Instantiate Detail View
     var oDetailView = sap.ui.xmlview({
         viewContent: jQuery('#detailView').html()
     });
 
-    // Add pages to splitApp
+    // Add views to splitApp
     splitApp = oAppView.byId('idSplitAppControl');
     splitApp.addMasterPage(oMasterView);
     splitApp.addDetailPage(oDetailView);
