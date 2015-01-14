@@ -1,34 +1,205 @@
 <!DOCTYPE HTML>
 <html>
 
-	<head>
-		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-		<meta charset="UTF-8">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta charset="UTF-8">
 
-		<title>TDG Demo App</title>
+    <title>Single Page TDG Demo App</title>
 
-		<script id="sap-ui-bootstrap"
-			src="https://sapui5.ap1.hana.ondemand.com/resources/sap-ui-cachebuster/sap-ui-core.js"
-			data-sap-ui-libs="sap.m"
-			data-sap-ui-theme="sap_bluecrystal"
-			data-sap-ui-xx-bindingSyntax="complex"
-			data-sap-ui-resourceroots='{"sap.ui.demo.tdg": "./"}'>
-		</script>
+    <script id="sap-ui-bootstrap" type="text/javascript" src="https://sapui5.ap1.hana.ondemand.com/resources/sap-ui-cachebuster/sap-ui-core.js" data-sap-ui-theme="sap_bluecrystal" data-sap-ui-libs="sap.m" data-sap-ui-xx-bindingSyntax="complex">
+    </script>
 
-		<link rel="stylesheet" type="text/css" href="css/style.css">
+    <!-- XML-based view definitions -->
+    <script id="appView" type="sapui5/xmlview">
+        <sap.ui.core.mvc:View controllerName="local.App.controller" xmlns="sap.m" xmlns:sap.ui.core="sap.ui.core" xmlns:sap.ui.core.mvc="sap.ui.core.mvc">
+            <Shell>
+                <app>
+                    <SplitApp id="idSplitAppControl" />
+                </app>
+            </Shell>
+        </sap.ui.core.mvc:View>
+    </script>
 
-		<script>
-			sap.ui.getCore().attachInit(function() {
-				new sap.m.Shell({
-					app: new sap.ui.core.ComponentContainer({
-						height : "100%",
-						name : "sap.ui.demo.tdg"
-					})
-				}).placeAt("content");
-			});
-		</script>
-	</head>
+    <script id="masterView" type="sapui5/xmlview">
+        <sap.ui.core.mvc:View controllerName="local.Master.controller" xmlns="sap.m" xmlns:sap.ui.core.mvc="sap.ui.core.mvc">
+            <Page id="page" title="Products">
+                <content>
+                    <List id="list" select="onSelect" mode="{device>/listMode}" noDataText="{i18n>masterListNoDataText}" growing="true" growingScrollToLoad="true" items="{/Products}">
+                        <items>
+                            <ObjectListItem press="onSelect" type="Active" counter="0" title="{Name}" number="{Price}" numberUnit="USD" markFavorite="false" markFlagged="false" showMarkers="false"></ObjectListItem>
+                        </items>
+                    </List>
+                </content>
+                <footer>
+                    <Toolbar>
+                    </Toolbar>
+                </footer>
+                <subHeader>
+                    <Bar id="searchBar">
+                        <contentMiddle>
+                            <SearchField id="searchField" search="onSearch" width="100%" placeholder="Search" showRefreshButton="{device>/isNoTouch}" tooltip="Search"></SearchField>
+                        </contentMiddle>
+                    </Bar>
+                </subHeader>
+            </Page>
+        </sap.ui.core.mvc:View>
+    </script>
 
-	<body class="sapUiBody" id="content" />
+    <script id="detailView" type="sapui5/xmlview">
+        <sap.ui.core.mvc:View controllerName="local.Detail.controller" xmlns="sap.m" xmlns:sap.ui.layout="sap.ui.layout" xmlns:sap.ui.layout.form="sap.ui.layout.form" xmlns:sap.ui.core.mvc="sap.ui.core.mvc">
+            <Page navButtonPress="onNavBack" title="Product" showNavButton="false">
+                <content>
+                    <ObjectHeader title="{Name}" number="{
+                    path: 'Price',
+                    formatter: 'formatter.currencyValue'
+                }" numberUnit="USD">
+                        <attributes>
+                            <ObjectAttribute text="From {
+                        path: 'ReleaseDate',
+                        type: 'sap.ui.model.type.Date'
+                        }" />
+                            <ObjectAttribute text="{Description}" />
+                        </attributes>
+                        <firstStatus>
+                            <ObjectStatus text="{
+                            path: 'DiscontinuedDate',
+                            formatter: 'formatter.discontinuedStatusValue'
+                        }" state="{
+                            path: 'DiscontinuedDate',
+                            formatter: 'formatter.discontinuedStatusState'
+                        }" />
+                        </firstStatus>
+                    </ObjectHeader>
+                    <IconTabBar id="idIconTabBar" selectedKey="supplier">
+                        <items>
+                            <IconTabFilter text="Supplier" key="supplier" icon="sap-icon://supplier">
+                                <content>
+                                    <sap.ui.layout:Grid width="auto" defaultSpan="L12 M12 S12">
+                                        <sap.ui.layout:content>
+                                            <sap.ui.layout.form:SimpleForm minWidth="1024" editable="false" layout="ResponsiveGridLayout" labelSpanL="3" labelSpanM="3" emptySpanL="4" emptySpanM="4" columnsL="1" title="Supplier Address">
+                                                <sap.ui.layout.form:content>
+                                                    <Label text="Name"></Label>
+                                                    <Text text="{Supplier/Name}" maxLines="0"></Text>
+                                                    <Label text="Street"></Label>
+                                                    <Text text="{Supplier/Address/Street}" maxLines="0"></Text>
+                                                    <Label text="City"></Label>
+                                                    <Text text="{Supplier/Address/City}" maxLines="0"></Text>
+                                                    <Label text="ZIP Code"></Label>
+                                                    <Text text="{Supplier/Address/ZipCode}" maxLines="0"></Text>
+                                                    <Label text="Country"></Label>
+                                                    <Text text="{Supplier/Address/Country}" maxLines="0"></Text>
+                                                </sap.ui.layout.form:content>
+                                            </sap.ui.layout.form:SimpleForm>
+                                        </sap.ui.layout:content>
+                                    </sap.ui.layout:Grid>
+                                </content>
+                            </IconTabFilter>
+                            <IconTabFilter text="Category" key="category" icon="sap-icon://hint">
+                                <content>
+                                    <sap.ui.layout:Grid width="auto" defaultSpan="L12 M12 S12">
+                                        <sap.ui.layout:content>
+                                            <sap.ui.layout.form:SimpleForm minWidth="1024" editable="false" layout="ResponsiveGridLayout" labelSpanL="3" labelSpanM="3" emptySpanL="4" emptySpanM="4" columnsL="1" title="Category Assignment}">
+                                                <sap.ui.layout.form:content>
+                                                    <Label text="ID"></Label>
+                                                    <Text text="{Category/ID}" maxLines="0"></Text>
+                                                    <Label text="Name"></Label>
+                                                    <Text text="{Category/Name}" maxLines="0"></Text>
+                                                </sap.ui.layout.form:content>
+                                            </sap.ui.layout.form:SimpleForm>
+                                        </sap.ui.layout:content>
+                                    </sap.ui.layout:Grid>
+                                </content>
+                            </IconTabFilter>
+                        </items>
+                    </IconTabBar>
+                </content>
+                <footer>
+                    <Toolbar></Toolbar>
+                </footer>
+            </Page>
+        </sap.ui.core.mvc:View>
+    </script>
+
+    <script>
+    var formatter = {
+        uppercaseFirstChar: function(sStr) {
+            return sStr.charAt(0).toUpperCase() + sStr.slice(1);
+        },
+        discontinuedStatusState: function(sDate) {
+            return sDate ? "Error" : "None";
+        },
+        discontinuedStatusValue: function(sDate) {
+            return sDate ? "Discontinued" : "";
+        },
+        currencyValue: function(value) {
+            return parseFloat(value).toFixed(2);
+        }
+    };
+
+    // App Controller definition
+    sap.ui.controller("local.App.controller", {});
+
+    // Instantiate the App View, assign a model and display
+    var oAppView = sap.ui.xmlview({
+        viewContent: jQuery('#appView').html()
+    });
+
+    oAppView.setModel(
+        sap.ui.model.odata.ODataModel("/V2/(S(sapuidemotdg))/OData/OData.svc/", true)
+    );
+
+    oAppView.placeAt('content');
+
+    // Master Controller definition
+    sap.ui.controller("local.Master.controller", {
+        onSearch: function() {
+            // add filter for search
+            var filters = [];
+            var searchString = this.getView().byId("searchField").getValue();
+            if (searchString && searchString.length > 0) {
+                filters = [new sap.ui.model.Filter("Name", sap.ui.model.FilterOperator.Contains, searchString)];
+            }
+            // update list binding
+            this.getView().byId("list").getBinding("items").filter(filters);
+        },
+
+        onSelect: function(oEvent) {
+            var oItem = oEvent.getParameter("listItem") || oEvent.getSource();
+            oDetailView.bindElement(oItem.getBindingContextPath(), {
+                expand: 'Supplier,Category'
+            })
+        }
+    });
+
+    // Instantiate Master View
+    var oMasterView = sap.ui.xmlview({
+        viewContent: jQuery('#masterView').html()
+    });
+
+    // Detail Controller definition
+    sap.ui.controller("local.Detail.controller", {});
+
+    // Instantiate Detail View
+    var oDetailView = sap.ui.xmlview({
+        viewContent: jQuery('#detailView').html()
+    });
+
+    // Add pages to splitApp
+    splitApp = oAppView.byId('idSplitAppControl');
+    splitApp.addMasterPage(oMasterView);
+    splitApp.addDetailPage(oDetailView);
+
+    // Set initial Product
+    oDetailView.bindElement('/Products(0)', {
+        expand: 'Supplier,Category'
+    });
+    </script>
+
+</head>
+
+<body class="sapUiBody" role="application">
+    <div id="content"></div>
+</body>
 
 </html>
